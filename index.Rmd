@@ -156,6 +156,9 @@ abstractseparate: false  # include front page w/ abstract for examination school
 includeline-num: false # show line numbering in PDF?
 line-wrapping-in-code: true #wrap overflowing lines in code blocks?
 
+### symbol footnotes (see https://stackoverflow.com/a/69489747)
+header-includes:
+ - \renewcommand*{\thefootnote}{\fnsymbol{footnote}}
 
 #####################
 ## output details  ##
