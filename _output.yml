@@ -1,0 +1,29 @@
+bookdown::pdf_book:
+  template: templates/template.tex
+  keep_tex: true
+  latex_engine: xelatex
+  pandoc_args: "--lua-filter=scripts_and_filters/colour_and_highlight.lua"
+
+bookdown::bs4_book: 
+  css: 
+    - templates/bs4_style.css
+    - templates/corrections.css # remove to stop highlighting corrections
+  theme:
+    primary: "#410E99"
+  repo: https://gitlab.com/rmgpanw/thesis-aw-oxforddown
+  pandoc_args: "--lua-filter=scripts_and_filters/colour_and_highlight.lua"
+
+bookdown::gitbook:
+  css: templates/style.css
+  config:
+    sharing:
+      facebook: false
+      twitter: yes
+      all: false
+  download: 
+    - ["_main.pdf", "PDF"]
+
+bookdown::word_document2:
+  toc: true
+  reference_docx: template.docx
+  number_sections: yes
