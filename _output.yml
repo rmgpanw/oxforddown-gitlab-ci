@@ -25,5 +25,5 @@ bookdown::gitbook:
 
 bookdown::word_document2:
   toc: true
-  reference_docx: template.docx
+  reference_docx: templates/template.docx
   number_sections: yes
