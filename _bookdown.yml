@@ -1,7 +1,7 @@
 # this sets the directory that your output gets stored in
 # Putting it in a 'docs' folder is convenient if you want to publish HTML
 # output with GitHub Pages 
-output_dir: "docs"
+output_dir: "public"
 
 # If the below is set to true, you don't have to manually delete the merged 
 # _main.Rmd file if something goes wrong when you try to build
@@ -20,4 +20,4 @@ rmd_subdir: ["front-and-back-matter"]
 
 # If you want people to be able to suggest and submit changes to the source .Rmd
 # files on your github repo, do it like so (https://bookdown.org/yihui/bookdown/html.html)
-edit: https://github.com/ulyngs/oxforddown/tree/master/%s
+# edit: https://github.com/ulyngs/oxforddown/tree/master/%s
