@@ -1,3 +1,16 @@
+# Notes on adapting `oxforddown` for GitLab
+
+See this repo's commit history for details on how the `oxforddown` template has been adapted for use with GitLab CI. My motivation was that for free tier subscriptions, GitLab pages are allowed for private repositories, where as GitHub pages are for public repositories only. 
+
+To summarise the main changes I have made:
+
+- Added `renv`.
+- Added a `.gitlab-ci.yml` file which builds the thesis on every push to GitLab.
+- Enabled use of the RStudio 'Build' tab and convenient 'cmd/ctrl+shift+b' keyboard shortcut for local builds.
+- Added notes and basic setup steps for using the `flextable` package for creating tables.
+
+A huge thanks to Ulrik Lyngs for this amazing template!
+
 # How to cite
 If you use this template to write your thesis, please cite it! :smiling_face_with_three_hearts:
 
