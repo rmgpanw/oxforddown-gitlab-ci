@@ -1,0 +1,42 @@
+image: rocker/verse:4.2.0
+
+.bookdown:
+  stage: deploy
+  script:
+    - Rscript -e "bookdown::render_book('index.Rmd', output_format = c('bookdown::bs4_book', 'bookdown::word_document2', 'bookdown::pdf_book'), output_dir = 'public')"
+  artifacts:
+    paths:
+      - public
+
+variables:
+  RENV_CONFIG_REPOS_OVERRIDE: "http://cran.r-project.org"
+  RENV_PATHS_CACHE: ${CI_PROJECT_DIR}/cache
+  RENV_PATHS_LIBRARY: ${CI_PROJECT_DIR}/renv/library
+
+cache:
+  key: ${CI_JOB_NAME}
+  paths:
+    - ${RENV_PATHS_CACHE}
+    - ${RENV_PATHS_LIBRARY}
+
+before_script:
+  - Rscript -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"
+  - Rscript -e "renv::restore()"
+
+pages:
+  extends: .bookdown
+  only:
+    - master
+
+mr-review:
+  extends: .bookdown
+  after_script:
+    - echo "ENVIRONMENT_URL=https://$CI_PROJECT_NAMESPACE.$CI_PAGES_DOMAIN/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public/index.html" >> deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: $ENVIRONMENT_URL
+  only:
+    - merge_requests
