@@ -169,6 +169,15 @@ documentclass: book
 always_allow_html: true #this allows html stuff in word (.docx) output
 ---
 
+```{r setup, include=FALSE}
+# flextable formatting options (see also https://davidgohel.github.io/flextable/reference/flextable_to_rmd.html)
+if (knitr::is_latex_output()) {
+  knitr::opts_chunk$set(ft.tabcolsep = 0, ft.latex.float = "none")
+}
+
+# make flextable tables use default latex font for pdf output (otherwise defaults to Helvetica font)
+flextable::set_flextable_defaults(fonts_ignore = TRUE)
+```
 
 ```{r install_packages, include=FALSE}
 source('scripts_and_filters/install_packages_if_missing.R')

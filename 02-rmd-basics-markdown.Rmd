@@ -261,6 +261,8 @@ cars %>%
 - Gotcha: when using [`kable`](https://www.rdocumentation.org/packages/knitr/versions/1.21/topics/kable), captions  are set inside the `kable` function
 - The `kable` package is often used with the [`kableExtra`](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html) package
 
+See also Section \@ref(flextable) for using the `flextable` package to create tables.
+
 ### Control positioning
 One thing that may be annoying is the way *R Markdown* handles "floats" like tables and figures.
 In your PDF output, LaTeX will try to find the best place to put your object based on the text around it and until you're really, truly done writing you should just leave it where it lies.

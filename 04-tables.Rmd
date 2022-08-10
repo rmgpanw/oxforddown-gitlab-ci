@@ -9,22 +9,140 @@ documentclass: book
 #bibliography: [bibliography/references.bib, bibliography/additional-references.bib]
 ---
 
-# Tables {#tables} 
+# Tables {#tables}
+
 \minitoc <!-- this will include a mini table of contents-->
 
 ## Making LaTeX tables play nice
+
 Dealing with tables in LaTeX can be painful.
 This section explains the main tricks you need to make the pain go away.
 
 (Note: if you are looking at the ebook version, you will not see much difference in this section, as it is only relevant for PDF output!)
 
-### Making your table pretty
+Two package options are described, `flextable` and `kable`/`kableExtra`.
+While the `flextable` package is optomised for Word output, it also produces great PDF and html tables.
+Also, tables produced by `kable` are not readable in Word output.
+
+### flextable {#flextable}
+
+Below is a basic flextable example.
+See also some simple setup steps in `index.Rmd` to set global flextable options (such as using the default latex font).
+
+```{r, message=FALSE}
+library(flextable)
+library(tidyverse)
+
+head(mtcars) %>% 
+  flextable()
+```
+
+Now including rownames and setting the table width to 6 inches:
+
+```{r}
+head(mtcars) %>% 
+  rownames_to_column() %>% 
+  flextable() %>% 
+  set_header_labels("rowname" = "") %>% 
+  width(width = 0.5)
+```
+
+You may find it particularly handy to use `flextable` together with `tbl_summary()` and `tbl_regression` from the `gtusmmary` package.
+
+```{r tbl-summary-flextable}
+library(gtsummary, 
+        warn.conflicts = FALSE)
+
+trial %>% 
+  select(trt, age, grade) %>% 
+  tbl_summary(by = trt) %>% 
+  bold_labels() %>% 
+  add_p() %>% 
+  as_flex_table() %>% 
+  bold(part = "header") %>% 
+  width(width = 1.5) %>% 
+  set_caption("A 'table 1' example.")
+```
+
+```{r tbl-regression-flextable}
+# build logistic regression model
+m1 <- glm(response ~ age + stage, trial, family = binomial)
+
+tbl_regression(m1, 
+               exponentiate = TRUE) %>% 
+  bold_labels() %>% 
+  as_flex_table() %>% 
+  width(width = 1.5) %>% 
+  italic(i = 1,
+         j = 4) %>% 
+  highlight(i = 1,
+            j = 4, 
+            color = "yellow") %>% 
+  bold(part = "header") %>% 
+  set_caption("A regression model example with an *italicised* and yellow highlighted p value.")
+```
+
+Some other tips:
+
+-   Note the use of `set_caption()`, which enables cross referencing (e.g. Table \@ref(tab:tbl-regression-flextable)) and adds the table to the list of tables (near the start of PDF output).
+-   For landscape tables, use the latex commands 'begin{landscape}' and 'end{landscape}' (see example Table \@ref(tab:landscape-table)).[^tables-1]
+-   For html and Word output the `flextable` autofit options may be preferable to manually specifying table dimensions (see example Tables \@ref(tab:landscape-table) and \@ref(tab:long-flextable)).
+-   For long tables, the header will be repeated at the top of each new page (see example Table \@ref(tab:long-flextable))
+
+[^tables-1]: This only seems to work with chunk option `echo=FALSE`.
+
+`r if(knitr::is_latex_output()) {"\\begin{landscape}"}`
+
+```{r landscape-table, echo=FALSE}
+tab <- head(mtcars) %>%
+  rownames_to_column() %>%
+  flextable() %>%
+  set_header_labels("rowname" = "") %>%
+  set_caption("An example landscape flextable table.")
+
+if (knitr::is_latex_output()) {
+  tab %>%
+    width(width = 0.75)
+} else if (knitr::is_html_output()) {
+  tab %>%
+    autofit()
+} else {
+  tab %>%
+    set_table_properties(layout = "autofit")
+}
+```
+
+`r if(knitr::is_latex_output()) {"\\end{landscape}"}`
+
+```{r long-flextable}
+tab <- mtcars %>% 
+  rownames_to_column() %>% 
+  select(1:8) %>% 
+  flextable() %>% 
+  set_header_labels("rowname" = "") %>% 
+  set_caption("A long flextable.")
+
+if (knitr::is_latex_output()) {
+  tab %>%
+    width(width = 0.75)
+} else if (knitr::is_html_output()) {
+  tab %>%
+    autofit()
+} else {
+  tab %>%
+    set_table_properties(layout = "autofit")
+}
+```
+
+### kable/kableExtra
+
+#### Making your table pretty
+
 When you use `kable` to create tables, you will almost certainly want to set the option `booktabs = TRUE`.
 This makes your table look a million times better:
 
 ```{r, message=FALSE}
 library(knitr)
-library(tidyverse)
 
 head(mtcars) %>% 
   kable(booktabs = TRUE)
@@ -34,14 +152,13 @@ head(mtcars) %>%
 
 Compare this to the default style, which looks terrible:
 
-
 ```{r}
 head(mtcars) %>% 
   kable()
 ```
 
+#### If your table is too wide
 
-### If your table is too wide
 You might find that your table expands into the margins of the page, like the tables above.
 Fix this with the `kable_styling` function from the [`kableExtra`](https://haozhu233.github.io/kableExtra/) package:
 
@@ -55,8 +172,8 @@ head(mtcars) %>%
 
 This scales down the table to fit the page width.
 
+#### If your table is too long
 
-### If your table is too long
 If your table is too long to fit on a single page, set `longtable = TRUE` in the `kable` function to split the table across multiple pages.
 
 ```{r}
@@ -76,8 +193,8 @@ a_long_table %>%
   kable_styling(latex_options = "repeat_header")
 ```
 
-Unfortunately, we cannot use the `scale_down` option with a `longtable`. 
-So if a `longtable` is too wide, you can either manually adjust the font size, or show the table in landscape layout. 
+Unfortunately, we cannot use the `scale_down` option with a `longtable`.
+So if a `longtable` is too wide, you can either manually adjust the font size, or show the table in landscape layout.
 To adjust the font size, use kableExtra's `font_size` option:
 
 ```{r}
@@ -95,10 +212,10 @@ a_long_table %>%
   landscape()
 ```
 
-### Max power: manually adjust the raw LaTeX output {#max-power}
+#### Max power: manually adjust the raw LaTeX output {#max-power}
+
 For total flexibility, you can adjust the raw LaTeX output from `kable`/`kableExtra` that generates the table.
-Let us consider how we would do this for the example of adjusting the font size if our table is too wide:
-Latex has a bunch of standard commands that set an approximate font size, as shown below in Figure \@ref(fig:latex-font-sizing).
+Let us consider how we would do this for the example of adjusting the font size if our table is too wide: Latex has a bunch of standard commands that set an approximate font size, as shown below in Figure \@ref(fig:latex-font-sizing).
 
 ```{r latex-font-sizing, echo=FALSE, out.width='50%', fig.cap="Font sizes in LaTeX", fig.pos="H", fig.align='center'}
 knitr::include_graphics("figures/sample-content/latex_font_sizes.png")
@@ -106,8 +223,8 @@ knitr::include_graphics("figures/sample-content/latex_font_sizes.png")
 
 You could use these to manually adjust the font size in your longtable in two steps:
 
-1. Wrap the longtable environment in, e.g., a `scriptsize` environment, by doing a string replacement in the output from `kable`/`kableExtra`
-2. Add the attributes that make R Markdown understand that the table is a table (it seems R drops these when we do the string replacement)
+1.  Wrap the longtable environment in, e.g., a `scriptsize` environment, by doing a string replacement in the output from `kable`/`kableExtra`
+2.  Add the attributes that make R Markdown understand that the table is a table (it seems R drops these when we do the string replacement)
 
 ```{r}
 our_adjusted_table <- a_long_table %>% 
